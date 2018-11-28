@@ -1,0 +1,30 @@
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-4.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Good Thymes Virtual Grocery</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <link rel="stylesheet" type="text/css" media="all"
+          href="../../css/gtvg.css" th:href="@{/css/gtvg.css}" />
+</head>
+
+<body>
+   <table>
+       <tr>
+           <th>id</th>
+           <th>姓名</th>
+           <th>年龄</th>
+       </tr>
+
+       <tr  th:each="user,userStat : ${userList}">
+           <td th:text="${user.id}"></td>
+           <td th:text="${user.name}"></td>
+           <td th:text="${user.age}"></td>
+       </tr>
+   </table>
+    <a href="/userRedis/index">新增</a>
+</body>
+
+</html>
