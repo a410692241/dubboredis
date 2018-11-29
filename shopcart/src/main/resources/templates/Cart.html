@@ -1,0 +1,22 @@
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-4.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <base th:href="${#request.getContextPath()+'/'}"/>
+    <title>首页</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <script type="text/javascript" src="js/jquery.min.js"></script>
+</head>
+
+<body>
+<form action="/shop/addCart" method="get">
+    商品id<input type="text" name="goodId" editabled="false" value="1">
+    商品名<input type="text"  editabled="false" value="苹果">
+    商品数量<input type="text" name="count">
+    <input type="submit" value="提交">
+</form>
+</body>
+
+</html>

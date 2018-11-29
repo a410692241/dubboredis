@@ -20,7 +20,7 @@
         })
         
         function callback(data) {
-            if (data != "") {
+            if (data != undefined && data != "") {
                 $("#usernameLB").html(data.username+"<a href='http://localhost:8085/login/logout'>注销</a>");
             }
         }
@@ -29,7 +29,8 @@
             debugger;
             var url = location.href;
             //用于对汉字进行转成unicode,避免乱码
-            var encodeURI = encodeURI(url);
+            var encodeURI = escape(url);
+             encodeURI.replace('&', '*');
             location.href = "http://localhost:8084/userRedis/lgin?lookUrl="+encodeURI;
         }
     </script>
@@ -40,6 +41,7 @@
     <a href="/userRedis/AddUser">新增</a>
     <a href="/userRedis/List">列表</a>
     <a href="javascript:login()">登录</a>
+    <a href="http://localhost:8088/shop/cart">添加购物车</a>
 </body>
 
 </html>

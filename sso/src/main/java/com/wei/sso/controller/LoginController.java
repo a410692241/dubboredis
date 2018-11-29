@@ -50,19 +50,26 @@ public class LoginController {
         User userRS = userService.selectByExample(userExample).stream().findFirst().orElse(null);
         if (userRS.getPassword().equals(user.getPassword())) {
             String uuid = UUID.randomUUID().toString();
-            redisTemplate.opsForValue().set(uuid,user);
-            redisTemplate.expire(uuid, 30, TimeUnit.MINUTES);
+            redisTemplate.opsForValue().set(uuid,userRS);
+            redisTemplate.expire(uuid, 7, TimeUnit.DAYS);
             Cookie cookie = new Cookie("token",uuid);
             //7天有效
             cookie.setMaxAge(7 * 24 * 60 * 60);
             //设置host
             cookie.setDomain("localhost");
-            //可能会有跨域的问题,为了防止银行的cookie被其他地址使用,所有本项目的cookie才能本项目使用,所以要设置setPath("/");
             cookie.setPath("/");
+            //可能会有跨域的问题,为了防止银行的cookie被其他地址使用,所有本项目的cookie才能本项目使用,所以要设置setPath("/");
+//            cookie.setPath("http://localhost:8084/userRedis/");
             response.addCookie(cookie);
 
         }
+        //前端对url进行&转*,后台转回来,防止在login方法开始的时候就把http://localhost:8085/login/login?lookUrl = http://localhost:8084/userRedis/?id=1&name=2
+        //中的lookUrl = http://localhost:8084/userRedis/?id=1当成一个参数name当做第二个参数
+        lookUrl = lookUrl.replace("*", "&");
         System.out.println(lookUrl);
+        if (lookUrl == null || "".equals(lookUrl)) {
+            lookUrl = "";
+        }
         return "redirect:"+lookUrl;
     }
 
