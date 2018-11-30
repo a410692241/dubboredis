@@ -3,20 +3,16 @@ package com.wei.shopcart.controller;
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.sun.rowset.internal.CachedRowSetReader;
 import com.wei.service.bo.*;
 import com.wei.service.service.CartService;
-import com.wei.service.service.GoodService;
 import com.wei.service.service.OrderService;
 import com.wei.shopcart.aop.IsLogin;
-import org.aspectj.weaver.ast.Or;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import sun.security.krb5.internal.ccache.CCacheInputStream;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -177,8 +173,9 @@ public class ShopcartController {
      * @param goodIdsList
      * @return
      */
+    @IsLogin
     @RequestMapping("addOrder")
-    public Object addOrder(@RequestParam("goodIds") List<String> goodIdsList) {
+    public Object addOrder(@RequestParam("goodIds") List<String> goodIdsList,User user,Model model) {
         //未登录
         for (String goodIds : goodIdsList) {
             String[] goodIdArr = goodIds.split(";");
@@ -186,11 +183,11 @@ public class ShopcartController {
             int count = Integer.parseInt(goodIdArr[1]);
             Order order = new Order();
             order.setGoodid(goodId);
+            order.setUserid(user.getId());
             order.setCount(count);
             orderService.insert(order);
         }
-
         //订单添加商品id
-        return "redirect:shop/orderList";
+        return "redirect:http://localhost:8084/userRedis/";
     }
 }

@@ -28,7 +28,6 @@ public class LoginAop {
      */
     @Around("execution(* com.wei.shopcart.controller.*.*(..)) && @annotation(com.wei.shopcart.aop.IsLogin)")
     public String isLogin(ProceedingJoinPoint proceedingJoinPoint) throws Throwable {
-        System.out.println("-----------------登录验证开始--------------------");
         Cookie[] cookies = request.getCookies();
         User user = null;
         if(cookies != null){
@@ -52,7 +51,34 @@ public class LoginAop {
         //proceedingJoinPoint.proceed(args);这样写会把springMVC的视图渲染器给截掉,返回不了页面,所以用下面的方式
         //下面的写法说明aop支持返回拦截
         return (String) proceedingJoinPoint.proceed(args);
+    }
 
 
+    @Around("execution(* com.wei.shopcart.controller.*.*(..)) && @annotation(com.wei.shopcart.aop.MustLogin)")
+    public Object mustLogin(ProceedingJoinPoint proceedingJoinPoint) throws Throwable {
+        System.out.println("-----------------登录跳转验证开始--------------------");
+        Cookie[] cookies = request.getCookies();
+        User user = null;
+        if(cookies != null){
+            for (Cookie cookie : cookies) {
+                if (cookie.getName().equals("token")) {
+                    String value = cookie.getValue();
+                    user = (User) redisTemplate.opsForValue().get(value);
+                    break;
+                }
+
+            }
+        }
+
+        //表示已经登录
+        if(user == null){
+            String queryString = request.getQueryString();
+            if (queryString == null || queryString == "null") {
+                queryString = "";
+            }
+            String fullUrl = request.getScheme() + "://" + request.getServerName() +":"+request.getServerPort() + request.getServletPath()+ queryString;
+            return "redirect:http://localhost:8084/userRedis/lgin?lookUrl=" + fullUrl;
+        }
+        return proceedingJoinPoint.proceed();
     }
 }
