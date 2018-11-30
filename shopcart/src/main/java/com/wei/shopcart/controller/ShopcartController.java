@@ -3,17 +3,20 @@ package com.wei.shopcart.controller;
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.wei.service.bo.Cart;
-import com.wei.service.bo.CartExample;
-import com.wei.service.bo.User;
+import com.sun.rowset.internal.CachedRowSetReader;
+import com.wei.service.bo.*;
 import com.wei.service.service.CartService;
+import com.wei.service.service.GoodService;
+import com.wei.service.service.OrderService;
 import com.wei.shopcart.aop.IsLogin;
+import org.aspectj.weaver.ast.Or;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import sun.security.krb5.internal.ccache.CCacheInputStream;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -22,7 +25,10 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Controller
@@ -30,9 +36,13 @@ import java.util.stream.Collectors;
 public class ShopcartController {
     @Reference
     private CartService cartService;
+    @Reference
+    private OrderService orderService;
 
 
-    /**未登录添加redis,登录添加数据库
+    /**
+     * 未登录添加redis,登录添加数据库
+     *
      * @param cart
      * @param user
      * @param cartJson
@@ -44,8 +54,8 @@ public class ShopcartController {
     @RequestMapping("/addCart")
     @Transactional
     public String addCart(Cart cart, User user,
-                          @RequestParam(value = "id",required = false) Integer id,
-                          @CookieValue(name = "carts",required = false) String cartJson,
+                          @RequestParam(value = "id", required = false) Integer id,
+                          @CookieValue(name = "carts", required = false) String cartJson,
                           HttpServletRequest request,
                           HttpServletResponse response) throws UnsupportedEncodingException {
         if (user == null && id == null) {
@@ -55,13 +65,14 @@ public class ShopcartController {
             carts.add(cart);
             //购物车有信息,累加到cookie
             if (cartJson != null && cartJson != "") {
-                TypeToken<List<Cart>> typeToken = new TypeToken<List<Cart>>() {};
+                TypeToken<List<Cart>> typeToken = new TypeToken<List<Cart>>() {
+                };
                 cartList = new Gson().fromJson(cartJson, typeToken.getType());
 
                 //商品id和数量添加到cookie
                 carts.addAll(cartList);
                 for (Cart cartBody : cartList) {
-                    if(cartBody.getGoodId() != null && cartBody.getGoodId().equals(cart.getGoodId())){
+                    if (cartBody.getGoodId() != null && cartBody.getGoodId().equals(cart.getGoodId())) {
                         carts = new ArrayList<>();
                         Map<Integer, List<Cart>> cartsMap = cartList.stream().collect(Collectors.groupingBy(Cart::getGoodId));
                         Cart sameGoodIdcart = cartsMap.get(cart.getGoodId()).stream().findFirst().orElse(null);
@@ -91,7 +102,8 @@ public class ShopcartController {
         } else {
             /*如果是模拟发送的http请求,即导入cookie的购物车到数据库*/
             if (id != null) {
-                TypeToken<List<Cart>> typeToken = new TypeToken<List<Cart>>(){};
+                TypeToken<List<Cart>> typeToken = new TypeToken<List<Cart>>() {
+                };
                 List<Cart> cartList = new Gson().fromJson(cartJson, typeToken.getType());
                 for (Cart cart1 : cartList) {
                     cart1.setUserid(id);
@@ -104,7 +116,7 @@ public class ShopcartController {
                     }
                 }
 
-            }else{
+            } else {
                 System.out.println(user.toString());
                 //登录则添加购物车到数据库
                 cart.setUserid(user.getId());
@@ -122,16 +134,17 @@ public class ShopcartController {
 
     @IsLogin
     @RequestMapping("/queryCart")
-    public Object queryCart(Model model,User user,@CookieValue(name = "carts",required = false) String carts) throws UnsupportedEncodingException {
+    public Object queryCart(Model model, User user, @CookieValue(name = "carts", required = false) String carts) throws UnsupportedEncodingException {
         //未登录,去cookie查购物车
         if (user == null) {
             if (carts != null) {
                 String cartJson = URLDecoder.decode(carts, "UTF-8");
-                TypeToken<List<Cart>> typeToken = new TypeToken<List<Cart>>() {};
+                TypeToken<List<Cart>> typeToken = new TypeToken<List<Cart>>() {
+                };
                 List<Cart> cartList = new Gson().fromJson(cartJson, typeToken.getType());
                 model.addAttribute("cartList", cartList);
             }
-        }else{
+        } else {
             //已登录,数据库
             CartExample example = new CartExample();
             CartExample.Criteria criteria = example.createCriteria();
@@ -141,4 +154,43 @@ public class ShopcartController {
         return "CartList";
     }
 
+    /**
+     * 添加订单
+     */
+    @IsLogin
+    @RequestMapping("orderList")
+    public Object orderList(Model model,User user) {
+        if(user == null){
+            return "redirect:http://localhost:8084/userRedis/lgin";
+        }
+        OrderExample example = new OrderExample();
+        OrderExample.Criteria criteria = example.createCriteria();
+        criteria.andUseridEqualTo(user.getId());
+        List<Order> orders = orderService.selectByExample(example);
+        model.addAttribute("orderList", orders);
+        //订单添加商品id
+        return "OrderList";
+    }
+
+    /**
+     * 添加订单
+     * @param goodIdsList
+     * @return
+     */
+    @RequestMapping("addOrder")
+    public Object addOrder(@RequestParam("goodIds") List<String> goodIdsList) {
+        //未登录
+        for (String goodIds : goodIdsList) {
+            String[] goodIdArr = goodIds.split(";");
+            int goodId = Integer.parseInt(goodIdArr[0]);
+            int count = Integer.parseInt(goodIdArr[1]);
+            Order order = new Order();
+            order.setGoodid(goodId);
+            order.setCount(count);
+            orderService.insert(order);
+        }
+
+        //订单添加商品id
+        return "redirect:shop/orderList";
+    }
 }

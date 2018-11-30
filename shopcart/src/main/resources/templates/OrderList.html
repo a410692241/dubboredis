@@ -11,20 +11,17 @@
 </head>
 
 <body>
-<form action="/shop/addOrder">
 <table>
     <tr>
         <th>商品id</th>
         <th>数量</th>
     </tr>
-    <input type="submit" th:value="添加">
-    <tr th:each="cart,stat : ${cartList}">
-        <td><input name="goodIds" th:value="${cart.goodId}+';'+${cart.count}" type="checkbox"></td>
-        <td th:text="${cart.goodId}"></td>
-        <td th:text="${cart.count}"></td>
+
+    <tr th:each="order,stat : ${orderList}">
+        <td th:text="${order.goodid}"></td>
+        <td th:text="${order.count}"></td>
     </tr>
 </table>
-</form>
 </body>
 
 </html>

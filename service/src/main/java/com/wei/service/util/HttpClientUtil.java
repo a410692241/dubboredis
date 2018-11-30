@@ -14,6 +14,7 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
@@ -91,15 +92,7 @@ public class HttpClientUtil {
                 // 创建Http Post请求
                 HttpPost httpPost = new HttpPost(url);
                 // 创建参数列表
-                if (param != null) {
-                    List<NameValuePair> paramList = new ArrayList<>();
-                    for (String key : param.keySet()) {
-                        paramList.add(new BasicNameValuePair(key, param.get(key)));
-                    }
-                    // 模拟表单
-                    UrlEncodedFormEntity entity = new UrlEncodedFormEntity(paramList, "utf-8");
-                    httpPost.setEntity(entity);
-                }
+                setParam(param, httpPost);
                 // 执行http请求
                 response = httpClient.execute(httpPost);
                 resultString = EntityUtils.toString(response.getEntity(), "utf-8");
@@ -130,17 +123,8 @@ public class HttpClientUtil {
                     httpPost.addHeader(headEnter.getKey(), headEnter.getValue());
                 }
             }
+            setParam(param, httpPost);
 
-            // 创建参数列表
-            if (param != null) {
-                List<NameValuePair> paramList = new ArrayList<>();
-                for (String key : param.keySet()) {
-                    paramList.add(new BasicNameValuePair(key, param.get(key)));
-                }
-                // 模拟表单
-                UrlEncodedFormEntity entity = new UrlEncodedFormEntity(paramList, "utf-8");
-                httpPost.setEntity(entity);
-            }
             // 执行http请求
             response = httpClient.execute(httpPost);
             resultString = EntityUtils.toString(response.getEntity(), "utf-8");
@@ -158,37 +142,85 @@ public class HttpClientUtil {
         return resultString;
     }
 
+    /**创建参数列表
+     * @param param
+     * @param httpPost
+     * @throws UnsupportedEncodingException
+     */
+    private static void setParam(Map<String, String> param, HttpPost httpPost) throws UnsupportedEncodingException {
+        if (param != null) {
+            List<NameValuePair> paramList = new ArrayList<>();
+            for (String key : param.keySet()) {
+                paramList.add(new BasicNameValuePair(key, param.get(key)));
+            }
+            // 模拟表单
+            UrlEncodedFormEntity entity = new UrlEncodedFormEntity(paramList, "utf-8");
+            httpPost.setEntity(entity);
+        }
+    }
 
-        public static String doPost (String url){
+
+    public static String doPost (String url){
             return doPost(url, null);
         }
 
-        public static String doPostJson (String url, String json){
-            // 创建Httpclient对象
-            CloseableHttpClient httpClient = HttpClients.createDefault();
-            CloseableHttpResponse response = null;
-            String resultString = "";
+    public static String doPostJson (String url, String json){
+        // 创建Httpclient对象
+        CloseableHttpClient httpClient = HttpClients.createDefault();
+        CloseableHttpResponse response = null;
+        String resultString = "";
+        try {
+            // 创建Http Post请求
+            HttpPost httpPost = new HttpPost(url);
+            // 创建请求内容
+            StringEntity entity = new StringEntity(json, ContentType.APPLICATION_JSON);
+            httpPost.setEntity(entity);
+            // 执行http请求
+            response = httpClient.execute(httpPost);
+            resultString = EntityUtils.toString(response.getEntity(), "utf-8");
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
             try {
-                // 创建Http Post请求
-                HttpPost httpPost = new HttpPost(url);
-                // 创建请求内容
-                StringEntity entity = new StringEntity(json, ContentType.APPLICATION_JSON);
-                httpPost.setEntity(entity);
-                // 执行http请求
-                response = httpClient.execute(httpPost);
-                resultString = EntityUtils.toString(response.getEntity(), "utf-8");
-            } catch (Exception e) {
+                response.close();
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
                 e.printStackTrace();
-            } finally {
-                try {
-                    response.close();
-                } catch (IOException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
             }
-
-            return resultString;
         }
+
+        return resultString;
+    }
+
+    public static String doPostJson (String url, String json,Map < String, String > headers){
+        // 创建Httpclient对象
+        CloseableHttpClient httpClient = HttpClients.createDefault();
+        CloseableHttpResponse response = null;
+        String resultString = "";
+        try {
+            // 创建Http Post请求
+            HttpPost httpPost = new HttpPost(url);
+            for (Map.Entry<String, String> headEntry : headers.entrySet()) {
+                httpPost.addHeader(headEntry.getKey(),headEntry.getValue());
+            }
+            // 创建请求内容
+            StringEntity entity = new StringEntity(json, ContentType.APPLICATION_JSON);
+            httpPost.setEntity(entity);
+            // 执行http请求
+            response = httpClient.execute(httpPost);
+            resultString = EntityUtils.toString(response.getEntity(), "utf-8");
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                response.close();
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
+
+        return resultString;
+    }
 
     }
