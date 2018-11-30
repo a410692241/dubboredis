@@ -3,7 +3,7 @@
 <mapper namespace="com.wei.provider.dao.CartDao">
   <resultMap id="BaseResultMap" type="com.wei.service.bo.Cart">
     <id column="id" jdbcType="INTEGER" property="id" />
-    <result column="userId" jdbcType="INTEGER" property="goodId" />
+    <result column="userId" jdbcType="INTEGER" property="userId" />
     <result column="goodId" jdbcType="VARCHAR" property="goodId" />
     <result column="count" jdbcType="INTEGER" property="count" />
   </resultMap>
@@ -109,13 +109,13 @@
   <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.wei.service.bo.Cart" useGeneratedKeys="true">
     insert into cart (userId, goodId, `count`
       )
-    values (#{goodId,jdbcType=INTEGER}, #{goodId,jdbcType=VARCHAR}, #{count,jdbcType=INTEGER}
+    values (#{userId,jdbcType=INTEGER}, #{goodId,jdbcType=VARCHAR}, #{count,jdbcType=INTEGER}
       )
   </insert>
   <insert id="insertSelective" keyColumn="id" keyProperty="id" parameterType="com.wei.service.bo.Cart" useGeneratedKeys="true">
     insert into cart
     <trim prefix="(" suffix=")" suffixOverrides=",">
-      <if test="goodId != null">
+      <if test="userId != null">
         userId,
       </if>
       <if test="goodId != null">
@@ -126,8 +126,8 @@
       </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
-      <if test="goodId != null">
-        #{goodId,jdbcType=INTEGER},
+      <if test="userId != null">
+        #{userId,jdbcType=INTEGER},
       </if>
       <if test="goodId != null">
         #{goodId,jdbcType=VARCHAR},
@@ -149,8 +149,8 @@
       <if test="record.id != null">
         id = #{record.id,jdbcType=INTEGER},
       </if>
-      <if test="record.goodId != null">
-        userId = #{record.goodId,jdbcType=INTEGER},
+      <if test="record.userId != null">
+        userId = #{record.userId,jdbcType=INTEGER},
       </if>
       <if test="record.goodId != null">
         goodId = #{record.goodId,jdbcType=VARCHAR},
@@ -166,7 +166,7 @@
   <update id="updateByExample" parameterType="map">
     update cart
     set id = #{record.id,jdbcType=INTEGER},
-      userId = #{record.goodId,jdbcType=INTEGER},
+      userId = #{record.userId,jdbcType=INTEGER},
       goodId = #{record.goodId,jdbcType=VARCHAR},
       `count` = #{record.count,jdbcType=INTEGER}
     <if test="_parameter != null">
@@ -176,8 +176,8 @@
   <update id="updateByPrimaryKeySelective" parameterType="com.wei.service.bo.Cart">
     update cart
     <set>
-      <if test="goodId != null">
-        userId = #{goodId,jdbcType=INTEGER},
+      <if test="userId != null">
+        userId = #{userId,jdbcType=INTEGER},
       </if>
       <if test="goodId != null">
         goodId = #{goodId,jdbcType=VARCHAR},
@@ -190,7 +190,7 @@
   </update>
   <update id="updateByPrimaryKey" parameterType="com.wei.service.bo.Cart">
     update cart
-    set userId = #{goodId,jdbcType=INTEGER},
+    set userId = #{userId,jdbcType=INTEGER},
       goodId = #{goodId,jdbcType=VARCHAR},
       `count` = #{count,jdbcType=INTEGER}
     where id = #{id,jdbcType=INTEGER}

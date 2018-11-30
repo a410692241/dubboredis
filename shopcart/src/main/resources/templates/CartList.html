@@ -1,0 +1,27 @@
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-4.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <base th:href="${#request.getContextPath()+'/'}"/>
+    <title>添加成功</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <script type="text/javascript" src="js/jquery.min.js"></script>
+</head>
+
+<body>
+<table>
+    <tr>
+        <th>商品id</th>
+        <th>数量</th>
+    </tr>
+
+    <tr  th:each="cart,stat : ${cartList}">
+        <td th:text="${cart.goodId}"></td>
+        <td th:text="${cart.count}"></td>
+    </tr>
+</table>
+</body>
+
+</html>

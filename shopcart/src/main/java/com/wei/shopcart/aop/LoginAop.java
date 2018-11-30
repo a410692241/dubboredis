@@ -28,7 +28,7 @@ public class LoginAop {
      */
     @Around("execution(* com.wei.shopcart.controller.*.*(..)) && @annotation(com.wei.shopcart.aop.IsLogin)")
     public String isLogin(ProceedingJoinPoint proceedingJoinPoint) throws Throwable {
-        System.out.println("开始");
+        System.out.println("-----------------登录验证开始--------------------");
         Cookie[] cookies = request.getCookies();
         User user = null;
         if(cookies != null){

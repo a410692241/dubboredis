@@ -7,6 +7,7 @@ import com.wei.service.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -39,8 +40,6 @@ public class UserRedisController {
     }
     @RequestMapping("/")
     public Object All(Model model) {
-        List<User> users = userService.selectByExample(new UserExample());
-        model.addAttribute("userList", users);
         return "Index";
     }
 
@@ -70,6 +69,7 @@ public class UserRedisController {
      * @return
      */
     @RequestMapping("/saveUser")
+    @Transactional
     public Object updateUser(User user) {
         if (user.getId() != null) {
              userService.updateByPrimaryKey(user);
