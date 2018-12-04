@@ -20,12 +20,12 @@ public class PayUtil {
     }
 
 
-    public static String pay(String out_trade_no,double totalAmountl,String subject,String notifyUrl) {
+    public static String pay(String out_trade_no,double totalAmountl,String subject,String returnUrl,String notifyUrl) {
         AlipayClient alipayClient =new DefaultAlipayClient(
                 Config.gateway,Config.appid,Config.privateKey,"json","UTF-8",Config.publicKey,Config.gnType);
         AlipayTradePagePayRequest request = new AlipayTradePagePayRequest();
         request.setNotifyUrl(notifyUrl);
-        request.setReturnUrl(notifyUrl);
+        request.setReturnUrl(returnUrl);
         String bizContent = "{" +
                 "    \"out_trade_no\":\""+out_trade_no+"\"," +
                 "    \"scene\":\"bar_code\"," +

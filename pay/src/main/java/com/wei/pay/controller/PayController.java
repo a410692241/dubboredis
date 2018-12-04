@@ -12,11 +12,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.*;
+import java.util.List;
 
 @Controller
 @RequestMapping("/pay")
@@ -29,6 +28,11 @@ public class PayController {
 
     /**
      * 添加订单
+     *
+     * @param model
+     * @param goodIds
+     * @param counts
+     * @return
      */
     @IsLogin
     @MustLogin
@@ -45,11 +49,21 @@ public class PayController {
         return "payList";
     }
 
+
+
+
+
+
+    /**添加支付宝支付
+     * @param totalAmountl
+     * @param orderId
+     * @param response
+     */
     @IsLogin
     @MustLogin
     @RequestMapping("addPay")
-    public void addPay(@RequestParam("totalAmount") double totalAmountl, @RequestParam("orderId") String orderId,HttpServletResponse response) {
-        String result = PayUtil.pay(orderId, totalAmountl, "在线商城支付", "http://localhost:8084/userRedis/");
+    public void addPay(@RequestParam("totalAmount") double totalAmountl, @RequestParam("orderId") String orderId, HttpServletResponse response) {
+        String result = PayUtil.pay(orderId, totalAmountl, "在线商城支付", "http://229t2351e9.51mypc.cn:23540/userRedis/","http://229t2351e9.51mypc.cn:23540/pay/message");
         PrintWriter writer = null;
         try {
             response.setContentType("text/html;charset=UTF-8");
@@ -61,24 +75,50 @@ public class PayController {
 
     }
 
+    /**
+     * @param orderId
+     * @param model
+     * @return等待支付界面
+     */
     @RequestMapping("loadPay")
-    public Object payResult(String orderId,Model model) {
+    public Object payResult(String orderId, Model model) {
         model.addAttribute("orderId", orderId);
         return "loadPay";
     }
 
+
+
+
+    /**
+     * @param orderId
+     * @return根据订单号获取支付结果
+     */
     @RequestMapping("getPayResult")
     @ResponseBody
     public Object getPayResult(@RequestParam("orderId") String orderId) {
         return PayUtil.getPayResult(orderId);
     }
 
+
+
+
+    /**
+     * @return支付成功
+     */
     @RequestMapping("paySuccess")
     public Object paySuccess() {
         return "paySuccess";
     }
 
 
+    /**
+     * @return支付成功异步通知
+     */
+    @RequestMapping("message")
+    @ResponseBody
+    public void message() {
+        System.out.println("支付成功异步通知");
+    }
 
 
 }
