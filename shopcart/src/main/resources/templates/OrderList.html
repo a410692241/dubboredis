@@ -16,11 +16,17 @@
         <th>商品id</th>
         <th>数量</th>
     </tr>
-
+<form action="http://localhost:8089/pay/payList">
     <tr th:each="order,stat : ${orderList}">
+        <input type="hidden" name="goodIds" th:value="${order.goodid}"/>
+        <input type="hidden" name="counts" th:value="${order.count}"/>
         <td th:text="${order.goodid}"></td>
         <td th:text="${order.count}"></td>
     </tr>
+
+    <br>
+    <input type="submit" th:value="支付"/>
+</form>
 </table>
 </body>
 

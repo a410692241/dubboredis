@@ -1,4 +1,4 @@
-package com.wei.shopcart.aop;
+package com.wei.service.aop;
 
 import java.lang.annotation.*;
 
@@ -22,7 +22,7 @@ import java.lang.annotation.*;
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 //登录验证注解
-public @interface MustLogin {
+public @interface IsLogin {
     /* 类型 参数名() @IsLogin(abc = "XXXX")
      * 类型[] 参数名() @IsLogin(arr={"1","2"})
      * 如果注解参数名是value 可以不写value @IsLogin("")或者@IsLogin,这样的注解一般用于不需要提供参数的注解,比如这里

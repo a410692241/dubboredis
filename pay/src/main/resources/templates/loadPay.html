@@ -1,0 +1,45 @@
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-4.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <base th:href="${#request.getContextPath()+'/'}"/>
+    <title>支付页面</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <script type="text/javascript" src="js/jquery.min.js">
+
+    </script>
+
+    <script type="text/javascript">
+        $(function () {
+            $("#success").click(function () {
+                $.ajax({
+                		url:"http://localhost:8089/pay/getPayResult",
+                		data:{"orderId":[[${orderId}]]},
+                		dataType:"json",
+                		success:function(data){
+                            if (data) {
+                                window.location.href = "http://localhost:8089/pay/paySuccess";
+                            }else{
+                                alert("请完成支付之后再来点击!");
+                            }
+                		}
+                });
+            })
+            $("#question").click(function () {
+                window.location.href = "http://localhost:8084/userRedis/";
+            });
+        })
+
+    </script>
+</head>
+
+<body>
+<h2 style="width: 300px;margin: 0 auto;">正在支付!</h2>
+<button id="success">支付完成</button>
+<button id="question">遇到问题</button>
+
+</body>
+
+</html>

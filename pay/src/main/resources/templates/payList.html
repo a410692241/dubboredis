@@ -1,0 +1,31 @@
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-4.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <base th:href="${#request.getContextPath()+'/'}"/>
+    <title>支付页面</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <script type="text/javascript" src="js/jquery.min.js"></script>
+    <script type="text/javascript">
+        $(function () {
+            var number = Math.ceil(Math.random()*10804410616106);
+            $("input[name='orderId']").val(number);
+            $("#startPay").click(function () {
+                window.open("/pay/loadPay?orderId="+number, "_blank");
+            })
+        })
+    </script>
+</head>
+
+<body>
+<form action="/pay/addPay">
+    总价格:<input type="text" name="totalAmount" th:value="${total_amount}"/>
+    <input type="hidden" name="orderId"/>
+    <input id="startPay" type="submit" value="支付">
+</form>
+
+</body>
+
+</html>

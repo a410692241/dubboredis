@@ -1,19 +1,17 @@
-package com.wei.shopcart;
+package com.wei.pay;
 
 import com.wei.service.aop.IsLoginAop;
-import com.wei.service.aop.MustLogin;
 import com.wei.service.aop.MustLoginAop;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 
 @SpringBootApplication
-public class ShopcartApplication {
+public class PayApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(ShopcartApplication.class, args);
+        SpringApplication.run(PayApplication.class, args);
     }
-
 
     @Bean
     public IsLoginAop getIsLoginAop() {
@@ -25,3 +23,4 @@ public class ShopcartApplication {
         return new MustLoginAop();
     }
 }
+
