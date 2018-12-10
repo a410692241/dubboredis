@@ -60,6 +60,7 @@ public class PayUtil {
         if(response.isSuccess()){
             System.out.println("调用成功");
             String tradeStatus = response.getTradeStatus();
+            //TRADE_SUCCESS表示调用成功
             if (tradeStatus.equals("TRADE_SUCCESS")) {
                 return true;
             }

@@ -50,10 +50,6 @@ public class PayController {
     }
 
 
-
-
-
-
     /**添加支付宝支付
      * @param totalAmountl
      * @param orderId
